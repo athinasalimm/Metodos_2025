@@ -13,14 +13,12 @@ def ortho_basis_from_normal(n):
 def sphere_wireframe(center, r, n_mer=36, n_par=18):
     cx, cy, cz = center
     traces = []
-    # meridianos
     phi = np.linspace(0, np.pi, n_par)
     for t in np.linspace(0, 2*np.pi, n_mer):
         x = cx + r*np.sin(phi)*np.cos(t)
         y = cy + r*np.sin(phi)*np.sin(t)
         z = cz + r*np.cos(phi)
         traces.append(go.Scatter3d(x=x, y=y, z=z, mode="lines", showlegend=False))
-    # paralelos
     u = np.linspace(0, 2*np.pi, n_mer)
     for p in np.linspace(0, np.pi, n_par):
         x = cx + r*np.sin(p)*np.cos(u)
@@ -41,7 +39,6 @@ def intersection_circle_two_spheres(c1, r1, c2, r2):
     ey, ez = ortho_basis_from_normal(ex)
     return pc, h, (ey, ez)
 
-# --- Ejemplo:
 c1, r1 = (0, 0, 0), 3.0
 c2, r2 = (4.0, 1.0, 0.5), 2.6
 

@@ -3,7 +3,6 @@ import plotly.graph_objects as go
 import plotly.io as pio
 pio.renderers.default = "browser"
 
-# ---------- util para wireframe ----------
 def sphere_wireframe(center, r, n_mer=36, n_par=18):
     cx, cy, cz = center
     traces = []
@@ -21,7 +20,6 @@ def sphere_wireframe(center, r, n_mer=36, n_par=18):
         traces.append(go.Scatter3d(x=x, y=y, z=z, mode="lines", showlegend=False))
     return traces
 
-# ---------- base ortonormal en el plano del círculo ----------
 def _basis_from_normal(n):
     n = n / np.linalg.norm(n)
     a = np.array([1.0, 0.0, 0.0]) if abs(n[0]) < 0.9 else np.array([0.0, 1.0, 0.0])
@@ -29,23 +27,22 @@ def _basis_from_normal(n):
     ez = np.cross(n, ey); ez /= np.linalg.norm(ez)
     return ey, ez
 
-# ---------- círculo de intersección entre dos esferas ----------
 def intersection_circle_two_spheres(c1, r1, c2, r2, n_pts=500):
     p1, p2 = np.array(c1, float), np.array(c2, float)
     d = np.linalg.norm(p2 - p1)
     if d == 0 or d > r1 + r2 or d < abs(r1 - r2):
-        return None  # no hay círculo real
+        return None  
     ex = (p2 - p1) / d
     a = (r1**2 - r2**2 + d**2) / (2*d)
-    pc = p1 + a*ex                       # centro del círculo
-    rc = np.sqrt(max(r1**2 - a**2, 0.0)) # radio del círculo
-    ey, ez = _basis_from_normal(ex)      # base en el plano del círculo
+    pc = p1 + a*ex                      
+    rc = np.sqrt(max(r1**2 - a**2, 0.0)) 
+    ey, ez = _basis_from_normal(ex)     
 
     t = np.linspace(0, 2*np.pi, n_pts)
     circle = pc.reshape(3,1) + rc*(ey.reshape(3,1)*np.cos(t) + ez.reshape(3,1)*np.sin(t))
-    return circle  # shape (3, n_pts)
+    return circle  
 
-# ---------- trilateración 3 esferas (dos soluciones típicas) ----------
+
 def trilaterate_3spheres(c1, r1, c2, r2, c3, r3, tol=1e-9):
     P1, P2, P3 = np.array(c1, float), np.array(c2, float), np.array(c3, float)
     ex = P2 - P1
@@ -55,7 +52,7 @@ def trilaterate_3spheres(c1, r1, c2, r2, c3, r3, tol=1e-9):
     i = np.dot(ex, P3 - P1)
     temp = P3 - P1 - i*ex
     temp_norm = np.linalg.norm(temp)
-    if temp_norm < tol: return []  # degenerado (casi colineales)
+    if temp_norm < tol: return []  
     ey = temp / temp_norm
     ez = np.cross(ex, ey)
 
@@ -74,7 +71,6 @@ def trilaterate_3spheres(c1, r1, c2, r2, c3, r3, tol=1e-9):
     sol2 = p_base - z*ez
     return [sol1, sol2]
 
-# --- Ejemplo:
 c1, r1 = (0.0, 0.0, 0.0), 3.0
 c2, r2 = (4.0, 0.5, 0.0), 2.7
 c3, r3 = (1.5, 3.5, 2.0), 3.1
@@ -86,42 +82,37 @@ traces += sphere_wireframe(c1, r1)
 traces += sphere_wireframe(c2, r2)
 traces += sphere_wireframe(c3, r3)
 
-# centros marcados
 for i, c in enumerate([c1, c2, c3], start=1):
     traces.append(go.Scatter3d(x=[c[0]], y=[c[1]], z=[c[2]],
                                mode="markers+text", text=[f"S{i}"], textposition="top center"))
 
-# círculo S1–S2
 circle = intersection_circle_two_spheres(c1, r1, c2, r2)
 if circle is not None:
     traces.append(go.Scatter3d(
         x=circle[0], y=circle[1], z=circle[2],
         mode="lines",
         name="Intersección S1–S2",
-        line=dict(width=5, color="black")  # color negro
+        line=dict(width=5, color="black")  
     ))
 
-#círculo S1–S3
 circle = intersection_circle_two_spheres(c1, r1, c3, r3)
 if circle is not None:
     traces.append(go.Scatter3d(
         x=circle[0], y=circle[1], z=circle[2],
         mode="lines",
         name="Intersección S1–S3",
-        line=dict(width=5, color="black")  # color negro
+        line=dict(width=5, color="black") 
     ))
 
-# círculo S2–S3
 circle = intersection_circle_two_spheres(c2, r2, c3, r3)
 if circle is not None:
     traces.append(go.Scatter3d(
         x=circle[0], y=circle[1], z=circle[2],
         mode="lines",
         name="Intersección S2–S3",
-        line=dict(width=5, color="black")  # color negro
+        line=dict(width=5, color="black")  
     ))
 
-# soluciones de las 3 esferas
 if len(sols) == 1:
     s = sols[0]
     traces.append(go.Scatter3d(x=[s[0]], y=[s[1]], z=[s[2]],
