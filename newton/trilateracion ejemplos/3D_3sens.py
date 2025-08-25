@@ -3,6 +3,8 @@ import plotly.graph_objects as go
 import plotly.io as pio
 pio.renderers.default = "browser"
 
+#Este es el caso del ejercicio de la guia!
+
 def sphere_wireframe(center, r, n_mer=36, n_par=18):
     cx, cy, cz = center
     traces = []

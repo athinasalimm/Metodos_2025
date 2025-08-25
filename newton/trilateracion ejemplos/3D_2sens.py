@@ -3,6 +3,9 @@ import plotly.graph_objects as go
 import plotly.io as pio
 pio.renderers.default = "browser"
 
+#Les dejo este codigo que quizas les sirve para el ejercicio de la guia donde newton es con 3 ecuaciones! (Recuerden que les queda un jacobiano 3x3)
+#Este es el caso con 2 sensores, el ejercicio es con 3 sensores, pero sirve para darse una idea de como al introducir el tercer sensor se reduce la interseccion de las esferas a dos puntos.
+
 def ortho_basis_from_normal(n):
     n = n / np.linalg.norm(n)
     a = np.array([1.0, 0.0, 0.0]) if abs(n[0]) < 0.9 else np.array([0.0, 1.0, 0.0])
